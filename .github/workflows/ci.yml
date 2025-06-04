@@ -1,0 +1,45 @@
+name: Build Flake
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: Ubuntu (x86_64)
+            packages: |
+              nix build .#thorium-avx
+              nix build .#thorium-avx2
+              nix build .#thorium-sse3
+              nix build .#thorium-sse4
+
+          - os: macos-latest
+            name: macOS (arm64)
+            packages: |
+              nix build .#thorium-arm
+
+          - os: macos-13
+            name: macOS (x64)
+            packages: |
+              nix build .#thorium-x64
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Check flake
+        run: nix flake check
+
+      - name: Build packages
+        run: ${{ matrix.packages }}
