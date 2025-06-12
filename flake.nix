@@ -97,12 +97,12 @@
                 chmod +x $out/bin/thorium
                 runHook postInstall
               '';
-              meta = with pkgs.lib; {
+              meta = {
                 description = "Thorium Browser (${toUpper variant}) - A fast and secure web browser";
                 homepage = "https://thorium.rocks";
-                license = licenses.bsd3;
+                license = pkgs.lib.licenses.bsd3;
                 platforms = [ system ];
-                maintainers = [ maintainers.Alex313031 ];
+                maintainers = [ pkgs.lib.maintainers.Alex313031 ];
                 mainProgram = "thorium";
               };
             };
